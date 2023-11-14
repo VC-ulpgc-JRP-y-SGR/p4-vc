@@ -135,7 +135,7 @@ def capture_cam():
     return vid
 ```
 
-#### Detección del rostro y aplicación del filtro
+##### Detección del rostro y aplicación del filtro
 
 Este fragmento de código es un script que utiliza las clases y funciones previamente definidas para aplicar un filtro "Piggy" a la transmisión de video de la cámara. Desglosamos el código:
 
