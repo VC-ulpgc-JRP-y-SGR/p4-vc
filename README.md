@@ -1,84 +1,110 @@
-## Práctica 4. Detección de caras
+# Práctica 4. Detección de caras
 
-### Contenidos
+## Filtro de orejas y nariz de cerdito
 
-[Aspectos cubiertos](#41-aspectos-cubiertos)
+Uno de los proyectos realizados para esta práctica es un filtro que, tras procesar y detectar un rostro, aplica unas imágenes de unas orejas y nariz  de cerdito en los lugares correspondientes del rostro.
 
-### 4.1. Aspectos cubiertos
+### Código
 
-Para esta práctica he preparado dos demostradores (*VC_P4.ipynb* y *VC_P4_deepface.ipynb*) que integran varios detectores faciales.
-El primero de ellos, *VC_P4*, integra cuatro variantes que buscan el rostro mayor de la imagen intentando localizar sus ojos para aplicar en su caso una normalización de tamaño y orientación:
+Para poder aplicar el filtro, se ha desarrollado una clase de python la cual hemos llamado **PiggyFilter**.
 
-- Detector de Viola y Jones [Viola04-ijcv]. La detección de caras se incorpora en OpenCV desde la implementación de Rainer Lienhart [Lienhart02] del conocido, y hoy añejo, detector.
-- Detector de Kazemi et al. [Kazemi14]
-- Detector basado en Convolutional Neural Networks (CNNs) [Feng21]
-- Detector Multi-task Cascaded Convolutional Networks (MTCNN) [Zhang16]
-
-Como primer paso, son necesarias algunas instalaciones de paquetes. Partiendo del *environment* *VC_P1* creado en la primera práctica, para ejecutar *VC_P4* he necesitado instalar los siguientes paquetes:
+###### Clase PiggyFilter
 
 ```
-conda activate VC_P1
-
-pip install imutils
-pip install dlib
-pip install mtcnn
-pip install tensorflow
+class PiggyFilter:
+    def __init__(self, earl_str, earr_str, nose_str):
+        self.earl_str = earl_str
+        self.earr_str = earr_str
+        self.nose_str = nose_str
 ```
 
-Por la experiencia previa, el paquete dlib suele ser el más problemático, en ocasiones requiere que se instale *cmake* y
-*Microsoft C++ Build Tools*. Una vez resueltos, o si no hay contratiempos, la ejecución de *VC_P4.ipynb* debería ser posible, todas las dependencias están instaladas, pero falta asegurar que todos los clasificadores están presentes en el directorio local. Al ejecutar debería aparecer un error por un archivo no encontrado. En el repositorio [github](https://github.com/otsedom/otsedom.github.io/blob/main/VC/README.md), se incluyen todos los modelos necesarios con excepción de los modelos de máscaras faciales, más pesados, motivo por el cual se produce error al no disponer de los archivos *shape_predictor_5_face_landmarks.dat* y *shape_predictor_68_face_landmarks.dat*. Por su mencionado tamaño no se han incluido en el repositorio. Para poder ejecutar la demo, deben descargarse desde el enlace proporcionado en el campus virtual (opción aconsejada), o
-desde el [repositorio de archivos de dlib](http://dlib.net/files/).
+* Constructor
 
-En primer término la implementación en OpenCV del detector de Viola y Jones [Viola04][Lienhart02] busca caras, en cuyo contenedor intenta localizar los ojos, aplicando la misma arquitectura de detector, pero adaptada al patrón ocular, por medio de los detectores entrenados años atrás en nuestro laboratorio [Castrillon11].
-Detectores faciales más recientes, tras detectar el rostro hacen uso de un modelo de sus elementos para encajarlo en la imagen utilizando como punto de partida un detector del rostro, intentando ajustar para cada cara detectada la máscara de puntos.
-Pulsando la tecla *d* cambias de detector, y para determinados detectores la tecla *e* permite alternar entre dos máscaras de puntos del rostro. Para este grupo de detectores, de mejor o peor forma se dibujan elementos faciales, desde cinco elementos, o en el caso mayor 68, correspondiendo a la indexación mostrada en la imagen a continuación.
-
-![Careto](images/landmarks.png)  
-*Máscara facial de 68 puntos con numeración*
-
-Dado que las máscaras tienen una numeración que permite el acceso a posiciones concretas, esta información se utiliza para normalizar la imagen (tamaño y orientación) en este ejemplo, pero puede utilizarse para otros fines como muestran las siguientes imágenes.
-
-![Careto](images/facemask2.png)  
-*Máscara sobre el rostro detectado*
-
-
-Para la demo con RetinaFace tengo problemillas de capacidad de cómputo en mi portátil. Sí he podido ejecutarla de forma fluida en el PC tras crear otro *environment* siguiendo la instrucciones de instalación de [deepface](https://github.com/serengil/deepface), y una vez con el entorno activo instalar deepface. Para un nuevo *environment* algo como:
+    Se le pasa por parámetros las cadenas de texto con las direcciones de las imágenes que se usarán en el filtro.
 
 ```
-conda create --name deepface python==3.11.5
-conda activate deepface
+    def _set_images(self, mode):
+        earl_img = cv2.imread(self.earl_str, mode)
+        earr_img = cv2.imread(self.earr_str, mode)
+        nose_img = cv2.imread(self.nose_str, mode)
 
-pip install deepface
+        self.earl_img = cv2.resize(earl_img, self.dim_ears)
+        self.earr_img = cv2.resize(earr_img, self.dim_ears)
+        self.nose_img = cv2.resize(nose_img, self.dim_nose)
 ```
 
+* Método **_set_images**
 
-Recordar que para ejecutar en VS Code en este nuevo *environment* se requiere como es habitual el paquete *ipykernel*.
+    Este método privado se encarga de cargar las imágenes de las orejas izquierda y derecha, así como la nariz, y redimensionarlas según las dimensiones definidas. El parámetro *mode* se utiliza para especificar el modo de carga de la imagen (cv2.IMREAD_UNCHANGED indica que se deben cargar canales de transparencia si están presentes).
 
-Deepface contiene *wrappers* de varios detectores, sin embargo en el ejemplo he optado por limitarlo a mostrar el resultado con RetinaFace con detección de todas las caras presentes. Si consigues ejecutarlo apreciarás robustez, pero también una mayor carga de procesamiento.
+```
+    def _set_images_pos(self, shape)
+        self.earl_pos = (shape[17][0]-int(self.dim_ears[0]/2), shape[17][1]-int(self.dim_ears[1]))
+        self.earr_pos = (shape[26][0]-int(self.dim_ears[0]/2), shape[26][1]-int(self.dim_ears[1]))
+        self.nose_pos = (shape[33][0]-int(self.dim_nose[0]/2), shape[33][1]-int(self.dim_nose[1]))
 
-Para usuarios linux y Mac, la retroalimentación de éxito que me ha llegado hasta ahora ha siso al instalar CUDA. <!--Algunos compañeros también necesitaron instalar tensorflow en Windows.-->
+```
 
-## Tarea
+* Método **_set_images_pos**
 
-Diseñar y codificar un prototipo que haga uso de la información facial para un determinado fin de temática libre. Los detectores proporcionan información del rostro, y de sus elementos faciales. Ideas inmediatas pueden ser filtros, aunque no hay limitaciones en este sentido.
+    Otra función privada que establece las posiciones de las imágenes de orejas y nariz en relación con la forma facial detectada. Utiliza puntos específicos de la forma facial (*shape*) para determinar las posiciones.
 
-La instalación debida a Zach Lieberman titulada [Más Que la Cara](https://zachlieberman.medium.com/más-que-la-cara-overview-48331a0202c0) puede dar otra fuente de inspiración.
+```
+    def _set_dims(self, width):
+        self.dim_ears = (int(width/2), int(width/2))
+        self.dim_nose = (int(width/2), int(width/4))
+```
 
-Tampoco hay limitación sobre el detector concreto a utilizar, acepto la utilización de otras herramientas. En este sentido puede interesarles echar un vistazo a [Mediapipe](https://google.github.io/mediapipe/).
+* Método **_set_dims**
 
+    Establece las dimensiones de las orejas y la nariz en función del ancho de la cara detectada.
 
-## Referencias
+```
+    def _combine_images(self, frame, image, image_pos, dim):
+        frame_roi = frame[image_pos[1]:image_pos[1]+dim[1], image_pos[0]:image_pos[0]+dim[0]]
+        image_roi = image[:, :, 0:3]
 
-[Castrillon11] Modesto Castrillón, Oscar Déniz,DanielHernández, and Javier Lorenzo. A comparison of face  and facial feature detectors based on the violajones general object detection framework. Machine Vision and Applications,2011.  
-[Feng21] Yuantao Feng and Shiqi Yu and Hanyang Peng and Yan-ran Li and Jianguo Zhang. Detect Faces Efficiently: A Survey and Evaluations. IEEE Transactions on Biometrics, Behavior, and Identity Science, 2021
-[Kazemi14] Vahid Kazemi and Josephine Sullivan. One Millisecond Face Alignment with an Ensemble of Regression Trees. In IEEE Conference on Computer Vision and Pattern Recognition, 2014
-[Lienhart02] Rainer Lienhart and Jochen Maydt. An extended set of Haar-like features for rapid object detection. ICIP 2002  
-[Viola04] Paul Viola and Michael J. Jones. Robust real-time face detection. International Journal of Computer Vision, 2004  
-[Zhang16] Zhang, K., Zhang, Z., Li, Z., and Qiao, Y. Joint face detection and alignment using multitask cascaded convolutional networks. IEEE Signal Processing Letters, 2016
+        mask = image[:, :, 3]
+        inversed_mask = cv2.bitwise_not(mask)
 
+        frame_masked = cv2.bitwise_and(frame_roi, frame_roi, mask=inversed_mask)
+        image_masked = cv2.bitwise_and(image_roi, image_roi, mask=mask)
 
-<!---Momentos en trabajo de Nayar sobre Binary images https://cave.cs.columbia.edu/Statics/monographs/Binary%20Images%20FPCV-1-3.pdf -->
+        fused = cv2.add(frame_masked, image_masked)
+        frame[image_pos[1]:image_pos[1]+dim[1], image_pos[0]:image_pos[0]+dim[0]] = fused
+        
+        return frame
+```
 
+* Método **_combine_images**
 
-***
-Bajo licencia de Creative Commons Reconocimiento - No Comercial 4.0 Internacional
+    Este método privado combina las imágenes de orejas y nariz con el marco de video. Utiliza máscaras para combinar las regiones de interés de las imágenes y el marco de video.
+
+```
+    def apply(self, frame, values):
+        face, eyes, shape = values
+        [face_x, _, face_width, _] = face
+
+        if face_x <= -1:
+           return frame
+         
+        [leye_x, _, _, _] = eyes
+
+        if leye_x <= -1:
+            return frame
+
+        self._set_dims(width = face_width)
+        self._set_images(mode = cv2.IMREAD_UNCHANGED)
+        self._set_images_pos(shape = shape)
+
+        frame = self._combine_images(frame, self.earl_img, self.earl_pos, self.dim_ears)
+        frame = self._combine_images(frame, self.earr_img, self.earr_pos, self.dim_ears)
+        frame = self._combine_images(frame, self.nose_img, self.nose_pos, self.dim_nose)
+
+        return frame
+```
+
+* Método **apply**
+
+    Este método es el principal que aplica el filtro. Recibe un marco de video y los valores de detección facial (*values*). Luego, extrae la región de interés de la cara, calcula las posiciones y dimensiones de las imágenes de orejas y nariz, y finalmente, aplica el filtro llamando a **_combine_images** para combinar las imágenes con el marco de video.
+
