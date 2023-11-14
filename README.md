@@ -145,7 +145,7 @@ Este fragmento de código es un script que utiliza las clases y funciones previa
 vid = capture_cam()
 ```
 
-    Se llama a la función **capture_cam** para obtener un objeto de captura de video (vid).
+Se llama a la función **capture_cam** para obtener un objeto de captura de video (vid).
 
 * Inicialización de detectores y filtro
 
@@ -153,7 +153,7 @@ vid = capture_cam()
 FDet = FaceDetectors.FaceDetector()
 piggyFilter = PiggyFilter('./images/left_ear.png', './images/right_ear.png', './images/nose.png')
 ```
-    Se crea una instancia de la clase **FaceDetector** y una instancia de la clase **PiggyFilter**.
+Se crea una instancia de la clase **FaceDetector** y una instancia de la clase **PiggyFilter**.
 
 * Bucle principal para la captura de video
 
