@@ -20,7 +20,7 @@ class PiggyFilter:
         self.nose_str = nose_str
 ```
 
-    Se le pasa por parámetros las cadenas de texto con las direcciones de las imágenes que se usarán en el filtro.
+Se le pasa por parámetros las cadenas de texto con las direcciones de las imágenes que se usarán en el filtro.
 
 
 * Método **_set_images**
@@ -36,7 +36,7 @@ class PiggyFilter:
         self.nose_img = cv2.resize(nose_img, self.dim_nose)
 ```
 
-    Este método privado se encarga de cargar las imágenes de las orejas izquierda y derecha, así como la nariz, y redimensionarlas según las dimensiones definidas. El parámetro *mode* se utiliza para especificar el modo de carga de la imagen (cv2.IMREAD_UNCHANGED indica que se deben cargar canales de transparencia si están presentes).
+Este método privado se encarga de cargar las imágenes de las orejas izquierda y derecha, así como la nariz, y redimensionarlas según las dimensiones definidas. El parámetro *mode* se utiliza para especificar el modo de carga de la imagen (cv2.IMREAD_UNCHANGED indica que se deben cargar canales de transparencia si están presentes).
 
 * Método **_set_images_pos**
 
@@ -47,7 +47,7 @@ class PiggyFilter:
         self.nose_pos = (shape[33][0]-int(self.dim_nose[0]/2), shape[33][1]-int(self.dim_nose[1]))
 ```
 
-    Otra función privada que establece las posiciones de las imágenes de orejas y nariz en relación con la forma facial detectada. Utiliza puntos específicos de la forma facial (*shape*) para determinar las posiciones.
+Otra función privada que establece las posiciones de las imágenes de orejas y nariz en relación con la forma facial detectada. Utiliza puntos específicos de la forma facial (*shape*) para determinar las posiciones.
 
 * Método **_set_dims**
 
@@ -57,7 +57,7 @@ class PiggyFilter:
         self.dim_nose = (int(width/2), int(width/4))
 ```
 
-    Establece las dimensiones de las orejas y la nariz en función del ancho de la cara detectada.
+Establece las dimensiones de las orejas y la nariz en función del ancho de la cara detectada.
 
 * Método **_combine_images**
 
@@ -78,7 +78,7 @@ class PiggyFilter:
         return frame
 ```
 
-    Este método privado combina las imágenes de orejas y nariz con el marco de video. Utiliza máscaras para combinar las regiones de interés de las imágenes y el marco de video.
+Este método privado combina las imágenes de orejas y nariz con el marco de video. Utiliza máscaras para combinar las regiones de interés de las imágenes y el marco de video.
 
 * Método **apply**
 
@@ -106,7 +106,7 @@ class PiggyFilter:
         return frame
 ```
 
-    Este método es el principal que aplica el filtro. Recibe un marco de video y los valores de detección facial (*values*). Luego, extrae la región de interés de la cara, calcula las posiciones y dimensiones de las imágenes de orejas y nariz, y finalmente, aplica el filtro llamando a **_combine_images** para combinar las imágenes con el marco de video.
+Este método es el principal que aplica el filtro. Recibe un marco de video y los valores de detección facial (*values*). Luego, extrae la región de interés de la cara, calcula las posiciones y dimensiones de las imágenes de orejas y nariz, y finalmente, aplica el filtro llamando a **_combine_images** para combinar las imágenes con el marco de video.
 
 ###### Captura de vídeo de la cámara
 
@@ -162,7 +162,7 @@ while True:
     ret, frame = vid.read()
 ```
 
-    Se inicia un bucle infinito que captura continuamente frames de video de la cámara.
+Se inicia un bucle infinito que captura continuamente frames de video de la cámara.
 
 * Detección de cara y ojos
 
@@ -171,7 +171,7 @@ while True:
     values = FDet.SingleFaceEyesDetection(frame, FDet.FaceDetectors[1], FDet.EyeDetectors[1])
 ```
 
-    Se utiliza el objeto *FDet* (instancia de **FaceDetector**) para realizar la detección de cara y ojos en el frame actual. La función **SingleFaceEyesDetection** devuelve valores asociados a la cara y los ojos si se encuentran.
+Se utiliza el objeto *FDet* (instancia de **FaceDetector**) para realizar la detección de cara y ojos en el frame actual. La función **SingleFaceEyesDetection** devuelve valores asociados a la cara y los ojos si se encuentran.
 
 * Aplicación del filtro Piggy
 
@@ -180,7 +180,7 @@ while True:
         frame = piggyFilter.apply(frame = frame, values = values)        
 ```
 
-    Si se detecta una cara y ojos (*values* no es None), se aplica el filtro Piggy al frame utilizando el objeto *piggyFilter*.
+Si se detecta una cara y ojos (*values* no es None), se aplica el filtro Piggy al frame utilizando el objeto *piggyFilter*.
 
 * Mostrar el frame con el filtro aplicado
 
@@ -188,7 +188,7 @@ while True:
     cv2.imshow('Cam', frame)
 ```
 
-    Muestra el frame resultante con el filtro aplicado en una ventana titulada 'Cam'.
+Muestra el frame resultante con el filtro aplicado en una ventana titulada 'Cam'.
 
 * Detener el bucle con la tecla Esc
 
@@ -208,7 +208,7 @@ vid.release()
 cv2.destroyAllWindows()
 ```
 
-    Al salir del bucle, se libera el objeto de captura de video y se cierran todas las ventanas.
+Al salir del bucle, se libera el objeto de captura de video y se cierran todas las ventanas.
 
 ### GIF ejemplo
 
