@@ -108,7 +108,7 @@ Este método privado combina las imágenes de orejas y nariz con el marco de vid
 
 Este método es el principal que aplica el filtro. Recibe un marco de video y los valores de detección facial (*values*). Luego, extrae la región de interés de la cara, calcula las posiciones y dimensiones de las imágenes de orejas y nariz, y finalmente, aplica el filtro llamando a **_combine_images** para combinar las imágenes con el marco de video.
 
-###### Captura de vídeo de la cámara
+##### Captura de vídeo de la cámara
 
 Para capturar un vídeo desde la cámara se ha desarrollado una función que simplifique el código.
 
@@ -135,7 +135,7 @@ def capture_cam():
     return vid
 ```
 
-##### Detección del rostro y aplicación del filtro
+#### Detección del rostro y aplicación del filtro
 
 Este fragmento de código es un script que utiliza las clases y funciones previamente definidas para aplicar un filtro "Piggy" a la transmisión de video de la cámara. Desglosamos el código:
 
