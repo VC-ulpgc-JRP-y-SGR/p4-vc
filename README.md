@@ -8,7 +8,7 @@ Uno de los proyectos realizados para esta práctica es un filtro que, tras proce
 
 Para poder aplicar el filtro, se ha desarrollado una clase de python la cual hemos llamado **PiggyFilter**.
 
-###### Clase PiggyFilter
+##### Clase PiggyFilter
 
 * Constructor
 
